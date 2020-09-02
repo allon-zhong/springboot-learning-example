@@ -6,9 +6,9 @@ import org.spring.springboot.domain.City;
 import org.spring.springboot.repository.CityRepository;
 import org.spring.springboot.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class CityESServiceImpl implements CityService {
     // 分页参数 -> TODO 代码可迁移到具体项目的公共 common 模块
     private static final Integer pageNumber = 0;
     private static final Integer pageSize = 10;
-    Pageable pageable = new PageRequest(pageNumber, pageSize);
+    Pageable pageable = PageRequest.of(pageNumber,pageSize);
 
     // ES 操作类
     @Autowired

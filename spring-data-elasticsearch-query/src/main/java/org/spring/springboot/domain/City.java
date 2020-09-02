@@ -1,5 +1,6 @@
 package org.spring.springboot.domain;
 
+import lombok.Data;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
@@ -9,6 +10,7 @@ import java.io.Serializable;
  * <p>
  * Created by bysocket on 20/06/2017.
  */
+@Data
 @Document(indexName = "province", type = "city")
 public class City implements Serializable {
 

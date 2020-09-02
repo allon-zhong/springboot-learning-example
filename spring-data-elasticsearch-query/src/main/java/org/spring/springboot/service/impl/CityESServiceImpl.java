@@ -1,5 +1,7 @@
 package org.spring.springboot.service.impl;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
@@ -87,18 +89,20 @@ public class CityESServiceImpl implements CityService {
         //   - 短语匹配 https://www.elastic.co/guide/cn/elasticsearch/guide/current/phrase-matching.html
         //   - 字段对应权重分设置，可以优化成 enum
         //   - 由于无相关性的分值默认为 1 ，设置权重分最小值为 10
-        FunctionScoreQueryBuilder functionScoreQueryBuilder = QueryBuilders.functionScoreQuery()
+       /* FunctionScoreQueryBuilder functionScoreQueryBuilder = QueryBuilders.functionScoreQuery()
                 .add(QueryBuilders.matchPhraseQuery("name", searchContent),
                 ScoreFunctionBuilders.weightFactorFunction(1000))
                 .add(QueryBuilders.matchPhraseQuery("description", searchContent),
                 ScoreFunctionBuilders.weightFactorFunction(500))
-                .scoreMode(SCORE_MODE_SUM).setMinScore(MIN_SCORE);
+                .scoreMode(SCORE_MODE_SUM).setMinScore(MIN_SCORE);*/
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("name",searchContent));
 
         // 分页参数
-        Pageable pageable = new PageRequest(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return new NativeSearchQueryBuilder()
                 .withPageable(pageable)
-                .withQuery(functionScoreQueryBuilder).build();
+                .withQuery(boolQueryBuilder).build();
     }
 
 

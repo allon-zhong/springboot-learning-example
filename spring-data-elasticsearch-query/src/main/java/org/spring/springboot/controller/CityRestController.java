@@ -17,7 +17,9 @@ import java.util.List;
 public class CityRestController {
 
     @Autowired
-    private CityService cityService;
+    private CityService cityESServiceImpl;
+    @Autowired
+    private CityService restClientServiceImpl;
 
     /**
      * 插入 ES 新城市
@@ -27,7 +29,12 @@ public class CityRestController {
      */
     @RequestMapping(value = "/api/city", method = RequestMethod.POST)
     public Long createCity(@RequestBody City city) {
-        return cityService.saveCity(city);
+        return cityESServiceImpl.saveCity(city);
+    }
+
+    @RequestMapping(value = "/api/rest/city", method = RequestMethod.POST)
+    public Long createCityRest(@RequestBody City city) {
+        return restClientServiceImpl.saveCity(city);
     }
 
     /**
@@ -42,6 +49,6 @@ public class CityRestController {
     public List<City> searchCity(@RequestParam(value = "pageNumber") Integer pageNumber,
                                                 @RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                 @RequestParam(value = "searchContent") String searchContent) {
-        return cityService.searchCity(pageNumber, pageSize,searchContent);
+        return cityESServiceImpl.searchCity(pageNumber, pageSize,searchContent);
     }
 }
