@@ -24,13 +24,14 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class RestClientServiceImpl implements CityService {
     private final String indexName = City.class.getAnnotation(Document.class).indexName();
-    private final String type = City.class.getAnnotation(Document.class).type();
+    private final String type = "_doc";
     @Autowired
     private RestHighLevelClient restClient;
 
@@ -47,39 +48,42 @@ public class RestClientServiceImpl implements CityService {
     }
 
     @Override
-    public List<City> searchCity(Integer pageNumber, Integer pageSize, String searchContent) {
+    public List<City> searchCity(String searchContent) {
 
-        SearchRequest searchRequest = new SearchRequest("test_es");
+        SearchRequest searchRequest = new SearchRequest("province");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         //如果用name直接查询，其实是匹配name分词过后的索引查到的记录(倒排索引)；如果用name.keyword查询则是不分词的查询，正常查询到的记录
 //        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("birthday").from("1991-01-01").to("2010-10-10").format("yyyy-MM-dd");//范围查询
-        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("score").from(10).to(20);
+//        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("score").from(10).to(20);
 //        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("name.keyword", name);//精准查询
-        PrefixQueryBuilder prefixQueryBuilder = QueryBuilders.prefixQuery("name.keyword", searchContent);//前缀查询
-        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery("name.keyword", "*三");//通配符查询
+//        MatchPhraseQueryBuilder matchPhraseQueryBuilder = QueryBuilders.matchPhraseQuery("name", searchContent);//前缀查询
+        String shouldContent = String.format("*%s*", searchContent);
+        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery("description", shouldContent);//通配符查询
 //        FuzzyQueryBuilder fuzzyQueryBuilder = QueryBuilders.fuzzyQuery("name", "三");//模糊查询
         FieldSortBuilder fieldSortBuilder = SortBuilders.fieldSort("score");//按照年龄排序
         fieldSortBuilder.sortMode(SortMode.MIN);//从小到大排序
 
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        boolQueryBuilder.must(wildcardQueryBuilder).should(prefixQueryBuilder);//and or  查询
+//        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+//        boolQueryBuilder.should(matchPhraseQueryBuilder);//and or  查询
+//        boolQueryBuilder.should(wildcardQueryBuilder);//and or  查询
 
-        sourceBuilder.query(boolQueryBuilder).sort(fieldSortBuilder);//多条件查询
+        sourceBuilder.query(wildcardQueryBuilder).sort(fieldSortBuilder);//多条件查询
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
         searchRequest.source(sourceBuilder);
         try {
             SearchResponse response = restClient.search(searchRequest, RequestOptions.DEFAULT);
             SearchHits hits = response.getHits();
-            JSONArray jsonArray = new JSONArray();
+            ArrayList<City> cities = new ArrayList<>();
             for (SearchHit hit : hits) {
                 String sourceAsString = hit.getSourceAsString();
-                JSONObject jsonObject = JSON.parseObject(sourceAsString);
-                jsonArray.add(jsonObject);
+                City city = JSON.parseObject(sourceAsString,City.class);
+                cities.add(city);
             }
-            return null;
+            return cities;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
+
 }

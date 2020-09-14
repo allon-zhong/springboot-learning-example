@@ -40,15 +40,11 @@ public class CityRestController {
     /**
      * 搜索返回分页结果
      *
-     * @param pageNumber 当前页码
-     * @param pageSize 每页大小
      * @param searchContent 搜索内容
      * @return
      */
     @RequestMapping(value = "/api/city/search", method = RequestMethod.GET)
-    public List<City> searchCity(@RequestParam(value = "pageNumber") Integer pageNumber,
-                                                @RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                                @RequestParam(value = "searchContent") String searchContent) {
-        return cityESServiceImpl.searchCity(pageNumber, pageSize,searchContent);
+    public List<City> searchCity(@RequestParam(value = "searchContent") String searchContent) {
+        return restClientServiceImpl.searchCity(searchContent);
     }
 }

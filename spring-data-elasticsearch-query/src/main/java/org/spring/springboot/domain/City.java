@@ -11,7 +11,7 @@ import java.io.Serializable;
  * Created by bysocket on 20/06/2017.
  */
 @Data
-@Document(indexName = "province", type = "city")
+@Document(indexName = "province")
 public class City implements Serializable {
 
     private static final long serialVersionUID = -1L;

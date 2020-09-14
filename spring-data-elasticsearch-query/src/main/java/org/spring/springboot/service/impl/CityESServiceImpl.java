@@ -47,27 +47,11 @@ public class CityESServiceImpl implements CityService {
     }
 
     @Override
-    public List<City> searchCity(Integer pageNumber, Integer pageSize, String searchContent) {
+    public List<City> searchCity(String searchContent) {
 
-        // 校验分页参数
-        if (pageSize == null || pageSize <= 0) {
-            pageSize = PAGE_SIZE;
-        }
-
-        if (pageNumber == null || pageNumber < DEFAULT_PAGE_NUMBER) {
-            pageNumber = DEFAULT_PAGE_NUMBER;
-        }
-
-        LOGGER.info("\n searchCity: searchContent [" + searchContent + "] \n ");
-
-        // 构建搜索查询
-        SearchQuery searchQuery = getCitySearchQuery(pageNumber,pageSize,searchContent);
-
-        LOGGER.info("\n searchCity: searchContent [" + searchContent + "] \n DSL  = \n " + searchQuery.getQuery().toString());
-
-        Page<City> cityPage = cityRepository.search(searchQuery);
-        return cityPage.getContent();
+        return null;
     }
+
 
     /**
      * 根据搜索词构造搜索查询语句
